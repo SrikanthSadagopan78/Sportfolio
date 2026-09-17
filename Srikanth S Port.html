@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Srikanth S — Software Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F3F6F9;
+    --bg-elev: #E7ECF2;
+    --panel: rgba(10, 20, 32, 0.04);
+    --panel-strong: rgba(10, 20, 32, 0.07);
+    --border: rgba(10, 20, 32, 0.12);
+    --text: #0E1420;
+    --text-dim: #5A6472;
+    --accent: #0E8074;
+    --accent-2: #7C3AED;
+    --accent-soft: rgba(14, 128, 116, 0.14);
+    --shadow: rgba(10, 20, 32, 0.10);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0A0E14;
+      --bg-elev: #10151E;
+      --panel: rgba(160, 200, 255, 0.045);
+      --panel-strong: rgba(160, 200, 255, 0.08);
+      --border: rgba(160, 200, 255, 0.12);
+      --text: #E8EDF3;
+      --text-dim: #8B95A6;
+      --accent: #45E0CE;
+      --accent-2: #C99CFF;
+      --accent-soft: rgba(69, 224, 206, 0.14);
+      --shadow: rgba(0, 0, 0, 0.4);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0A0E14;
+    --bg-elev: #10151E;
+    --panel: rgba(160, 200, 255, 0.045);
+    --panel-strong: rgba(160, 200, 255, 0.08);
+    --border: rgba(160, 200, 255, 0.12);
+    --text: #E8EDF3;
+    --text-dim: #8B95A6;
+    --accent: #45E0CE;
+    --accent-2: #C99CFF;
+    --accent-soft: rgba(69, 224, 206, 0.14);
+    --shadow: rgba(0, 0, 0, 0.4);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--accent-soft); color: var(--text); }
+
+  h1, h2, h3, h4 {
+    font-family: 'Space Grotesk', -apple-system, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  a { color: inherit; }
+
+  code, .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  /* ---------- Scrub progress bar ---------- */
+  #scrub {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 46px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 18px;
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    background: color-mix(in srgb, var(--bg) 72%, transparent);
+    border-bottom: 1px solid var(--border);
+  }
+  #scrub .brand {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    white-space: nowrap;
+    margin-right: 4px;
+  }
+  #scrub-track {
+    position: relative;
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    max-width: 480px;
+  }
+  #scrub-fill {
+    position: absolute;
+    top: 0; left: 0; height: 100%;
+    width: 0%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 60ms linear;
+  }
+  .scrub-dot {
+    position: absolute;
+    top: 50%;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .scrub-dot:hover { transform: translate(-50%, -50%) scale(1.4); }
+  .scrub-dot.active { background: var(--accent); }
+  #scrub-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    min-width: 76px;
+    text-align: right;
+  }
+
+  /* ---------- Hero ---------- */
+  #hero {
+    position: relative;
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 46px;
+    overflow: hidden;
+  }
+  #particles {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.55;
+  }
+  #glow {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(480px circle at var(--gx, 50%) var(--gy, 30%), var(--accent-soft), transparent 70%);
+    opacity: 0.7;
+    transition: opacity 0.4s ease;
+  }
+  .hero-inner { position: relative; z-index: 1; }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--accent-2);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  h1.name {
+    font-size: clamp(42px, 8vw, 76px);
+    line-height: 1.02;
+    margin-bottom: 20px;
+  }
+  h1.name .accent { color: var(--accent); }
+  #decrypt-name .ch {
+    display: inline-block;
+    color: var(--text-dim);
+    transition: color 0.15s ease;
+  }
+  #decrypt-name .ch.locked {
+    color: var(--text);
+    animation: ch-flash 0.55s ease;
+  }
+  @keyframes ch-flash {
+    0% { color: var(--accent); text-shadow: 0 0 14px var(--accent-soft), 0 0 3px var(--accent); }
+    100% { color: var(--text); text-shadow: none; }
+  }
+  .term-cursor {
+    display: inline-block;
+    width: 3px;
+    height: 0.78em;
+    background: var(--accent);
+    margin-left: 5px;
+    vertical-align: -0.08em;
+    animation: term-blink 0.9s steps(1) infinite;
+  }
+  .term-cursor.done { animation: none; opacity: 0; transition: opacity 0.5s ease; }
+  @keyframes term-blink { 50% { opacity: 0; } }
+  .eyebrow .dot { animation: pulse-dot 2.4s ease-in-out infinite; }
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 4px var(--accent-soft); }
+    50% { box-shadow: 0 0 0 7px var(--accent-soft); }
+  }
+
+  /* ---------- Custom reticle cursor ---------- */
+  html.custom-cursor, html.custom-cursor * { cursor: none !important; }
+  #cursor-ring, #cursor-dot { display: none; }
+  html.custom-cursor #cursor-ring, html.custom-cursor #cursor-dot { display: block; }
+  #cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    width: 28px; height: 28px;
+    margin: -14px 0 0 -14px;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  #cursor-ring .bracket {
+    position: absolute;
+    width: 9px; height: 9px;
+    border: 1.5px solid var(--accent);
+    transition: border-color 0.25s ease;
+  }
+  #cursor-ring .tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+  #cursor-ring .tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+  #cursor-ring .bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+  #cursor-ring .br { bottom: 0; right: 0; border-left: none; border-top: none; }
+  #cursor-dot {
+    position: fixed;
+    top: 0; left: 0;
+    width: 4px; height: 4px;
+    margin: -2px 0 0 -2px;
+    border-radius: 50%;
+    background: var(--accent);
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  html.cursor-active #cursor-ring {
+    transform: scale(1.5) rotate(45deg);
+  }
+  html.cursor-active #cursor-ring .bracket { border-color: var(--accent-2); }
+  html.cursor-active #cursor-dot { background: var(--accent-2); }
+  .hero-role {
+    font-size: clamp(17px, 2.4vw, 20px);
+    color: var(--text-dim);
+    max-width: 560px;
+    margin-bottom: 34px;
+  }
+  .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14.5px;
+    font-weight: 500;
+    padding: 12px 22px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease, color 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn.primary {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.primary:hover { opacity: 0.85; }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hero-meta {
+    margin-top: 56px;
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text-dim);
+  }
+  .hero-meta span b { color: var(--text); font-weight: 500; }
+
+  /* ---------- Sections ---------- */
+  section.block {
+    padding: 96px 0;
+    border-top: 1px solid var(--border);
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 44px;
+    gap: 20px;
+  }
+  .section-head h2 { font-size: clamp(28px, 4vw, 36px); }
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  /* About */
+  .about-text { font-size: 17px; color: var(--text-dim); max-width: 640px; }
+  .about-text p { margin: 0 0 18px; }
+  .about-text strong { color: var(--text); font-weight: 500; }
+
+  /* Skills */
+  .skill-group { margin-bottom: 26px; }
+  .skill-group h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent-2);
+    margin-bottom: 12px;
+    text-transform: lowercase;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+  .chip {
+    font-size: 13.5px;
+    padding: 7px 13px;
+    border-radius: 3px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.2s ease, background 0.2s ease;
+  }
+  .reveal.in .chip { opacity: 1; transform: translateY(0); }
+  .chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .chips .chip:nth-child(1) { transition-delay: 0.02s; }
+  .chips .chip:nth-child(2) { transition-delay: 0.06s; }
+  .chips .chip:nth-child(3) { transition-delay: 0.10s; }
+  .chips .chip:nth-child(4) { transition-delay: 0.14s; }
+  .chips .chip:nth-child(5) { transition-delay: 0.18s; }
+  .chips .chip:nth-child(6) { transition-delay: 0.22s; }
+  .chips .chip:nth-child(7) { transition-delay: 0.26s; }
+  .chips .chip:nth-child(8) { transition-delay: 0.30s; }
+  .chips .chip:nth-child(n+9) { transition-delay: 0.34s; }
+
+  /* Experience */
+  .timeline { position: relative; }
+  .job {
+    position: relative;
+    padding: 0 0 40px 32px;
+    border-left: 1px solid var(--border);
+  }
+  .job:last-child { padding-bottom: 4px; }
+  .job::before {
+    content: '';
+    position: absolute;
+    left: -5px; top: 4px;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    transition: box-shadow 0.3s ease;
+  }
+  .job:hover::before { box-shadow: 0 0 0 5px var(--accent-soft); }
+  .job-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-bottom: 6px;
+  }
+  .job-title { font-size: 19px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; }
+  .job-org { color: var(--accent); font-weight: 500; }
+  .job-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .job ul { margin: 12px 0 0; padding-left: 18px; color: var(--text-dim); }
+  .job li { margin-bottom: 7px; font-size: 15px; }
+  .job li::marker { color: var(--accent-2); }
+
+  /* Projects */
+  .proj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 26px;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.35s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 14px 28px var(--shadow);
+  }
+  .card h3 { font-size: 18px; margin-bottom: 10px; }
+  .card p { color: var(--text-dim); font-size: 14.5px; margin: 0 0 14px; }
+  .stack-row { display: flex; flex-wrap: wrap; gap: 7px; }
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    padding: 4px 9px;
+    border-radius: 20px;
+    transition: border-color 0.25s ease, color 0.25s ease;
+  }
+  .tag:hover { border-color: var(--accent-2); color: var(--text); }
+
+  /* Freelance / content */
+  .practice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .practice-card {
+    padding: 24px 22px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--panel);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.35s ease;
+  }
+  .practice-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-2);
+    box-shadow: 0 14px 28px var(--shadow);
+  }
+  .practice-card .mark { color: var(--accent); font-size: 13px; margin-bottom: 12px; font-family: 'IBM Plex Mono', monospace; }
+  .practice-card h4 { font-size: 16.5px; margin-bottom: 8px; }
+  .practice-card p { font-size: 14px; color: var(--text-dim); margin: 0 0 12px; }
+  .practice-card a { font-size: 13px; color: var(--accent-2); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+  .practice-card a:hover { border-color: var(--accent-2); }
+
+  /* Certifications / education */
+  .split-row { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .list-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14.5px;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-item .name { color: var(--text); }
+  .list-item .meta { color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; font-size: 12px; white-space: nowrap; }
+
+  /* Footer / contact */
+  #contact { text-align: left; }
+  #contact h2 { font-size: clamp(30px, 5vw, 46px); max-width: 520px; margin-bottom: 22px; }
+  .contact-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+  footer {
+    padding: 30px 0 60px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-dim);
+    font-size: 12.5px;
+    font-family: 'IBM Plex Mono', monospace;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media (max-width: 720px) {
+    .proj-grid, .practice-grid, .split-row { grid-template-columns: 1fr; }
+    #scrub .brand { display: none; }
+    .hero-meta { gap: 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor-ring">
+  <span class="bracket tl"></span><span class="bracket tr"></span><span class="bracket bl"></span><span class="bracket br"></span>
+</div>
+<div id="cursor-dot"></div>
+
+<div id="scrub">
+  <span class="brand">Srikanth&nbsp;S</span>
+  <div id="scrub-track">
+    <div id="scrub-fill"></div>
+  </div>
+  <span id="scrub-label" class="mono">intro</span>
+</div>
+
+<section id="hero" data-sec="intro">
+  <canvas id="particles"></canvas>
+  <div id="glow"></div>
+  <div class="wrap hero-inner">
+    <div class="eyebrow"><span class="dot"></span>Bengaluru, India — available for opportunities</div>
+    <h1 class="name"><span id="decrypt-name">Srikanth S</span><span id="decrypt-cursor" class="term-cursor"></span><br><span class="accent">builds</span> &amp; designs software.</h1>
+    <p class="hero-role">Software engineer with an iOS and frontend background, a cybersecurity foundation, and a parallel practice in UI/UX design, photography, and content development.</p>
+    <div class="hero-cta">
+      <a class="btn primary" href="#experience">View experience</a>
+      <a class="btn ghost" href="mailto:s.srikanthsurender@gmail.com">Get in touch</a>
+    </div>
+    <div class="hero-meta">
+      <span><b>Currently</b> iOS Developer Trainee, ANZ</span>
+      <span><b>Grad</b> B.E. Information Science, CMR Institute of Technology</span>
+      <span><b>CGPA</b> 8.79 / 10</span>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="about" data-sec="about">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>About</h2>
+      <span class="section-num mono">01</span>
+    </div>
+    <div class="about-text">
+      <p>I'm an Information Science graduate from CMR Institute of Technology, currently working as an <strong>iOS Developer Trainee at ANZ</strong>, where I contribute to native application development, debugging, and testing on a large-scale banking product. Before that, I worked as an <strong>SDE Intern at Trukker</strong>, handling data pipelines and database operations for a logistics platform.</p>
+      <p>My path into software started through design — I began as a <strong>UI/UX Design Intern at Extion Infotech</strong>, redesigning interfaces for e-commerce and blogging platforms. That background still shapes how I build: I care about interaction detail as much as implementation, and I still take on <strong>freelance UI/UX work</strong> alongside engineering.</p>
+      <p>Outside of client and employer work, I run a small <strong>content practice</strong> — photography, photo and video editing, and ongoing content development across Instagram and YouTube — and I'm working through <strong>CEH certification</strong> to round out a growing interest in cybersecurity and networking fundamentals.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="skills" data-sec="skills">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Skills</h2>
+      <span class="section-num mono">02</span>
+    </div>
+    <div class="skill-group">
+      <h4>languages &amp; frameworks</h4>
+      <div class="chips">
+        <span class="chip">Python</span><span class="chip">Pandas</span><span class="chip">Swift</span><span class="chip">MySQL</span><span class="chip">JavaScript</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h4>cybersecurity tools &amp; concepts</h4>
+      <div class="chips">
+        <span class="chip">Nmap</span><span class="chip">Wireshark</span><span class="chip">OSI Model</span><span class="chip">Networking Basics</span><span class="chip">Whois</span><span class="chip">OSINT</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h4>design</h4>
+      <div class="chips">
+        <span class="chip">UI/UX</span><span class="chip">Figma</span><span class="chip">Canva</span><span class="chip">Adobe Express</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h4>tools &amp; platforms</h4>
+      <div class="chips">
+        <span class="chip">Git / GitHub</span><span class="chip">Xcode</span><span class="chip">Docker</span><span class="chip">Linux</span><span class="chip">macOS</span><span class="chip">Windows</span><span class="chip">VS Code</span><span class="chip">Excel</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h4>methodologies &amp; ai</h4>
+      <div class="chips">
+        <span class="chip">SDLC</span><span class="chip">Agile</span><span class="chip">Waterfall</span><span class="chip">Spiral</span><span class="chip">Prompt Engineering</span><span class="chip">AI-Assisted Development</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h4>professional</h4>
+      <div class="chips">
+        <span class="chip">Communication</span><span class="chip">Team Collaboration</span><span class="chip">Documentation</span><span class="chip">Adaptability</span><span class="chip">Problem Solving</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="experience" data-sec="experience">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Experience</h2>
+      <span class="section-num mono">03</span>
+    </div>
+    <div class="timeline">
+
+      <div class="job">
+        <div class="job-head">
+          <div><span class="job-title">iOS Developer Trainee</span> — <span class="job-org">ANZ</span></div>
+          <div class="job-date">Jun 2025 – Jun 2026</div>
+        </div>
+        <ul>
+          <li>Contributed to the Xcode 26 migration and ongoing application enhancement work through debugging and feature improvements.</li>
+          <li>Performed UI and unit testing with XCTest to ensure application stability and visual consistency.</li>
+          <li>Designed mobile app interfaces in Figma, creating wireframes, prototypes, and user flows.</li>
+          <li>Identified and resolved application issues during testing to improve stability and user experience.</li>
+          <li>Collaborated with cross-functional teams across debugging, testing, and enhancement activities.</li>
+          <li>Gained hands-on exposure across development, debugging, testing, and deployment workflows.</li>
+        </ul>
+      </div>
+
+      <div class="job">
+        <div class="job-head">
+          <div><span class="job-title">SDE Intern</span> — <span class="job-org">Trukker</span></div>
+          <div class="job-date">Mar 2025 – Jun 2025</div>
+        </div>
+        <ul>
+          <li>Organized and cleaned datasets of truck details using Pandas and Excel for accuracy and consistency.</li>
+          <li>Managed and maintained truck and driver databases in MongoDB, ensuring efficient data retrieval and updates.</li>
+        </ul>
+      </div>
+
+      <div class="job">
+        <div class="job-head">
+          <div><span class="job-title">UI/UX Design Intern</span> — <span class="job-org">Extion Infotech</span></div>
+          <div class="job-date">Sep 2024 – Jan 2025</div>
+        </div>
+        <ul>
+          <li>Redesigned user interfaces for an e-commerce platform, improving visual hierarchy, navigation, and overall user experience through user-centered design principles.</li>
+          <li>Optimized mobile app onboarding flows and end-to-end user journeys, increasing usability, engagement, and first-time user experience.</li>
+          <li>Designed responsive web interfaces for a blogging platform, ensuring accessibility, consistency, and seamless experiences across desktop, tablet, and mobile devices.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="projects" data-sec="projects">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Projects</h2>
+      <span class="section-num mono">04</span>
+    </div>
+    <div class="proj-grid">
+      <div class="card">
+        <h3>Predictive Modelling of Accidents</h3>
+        <p>A machine learning web application that predicts accident severity as "Serious" or "Slight," using WeatherStack's real-time weather data as an input to the prediction model.</p>
+        <div class="stack-row">
+          <span class="tag">Python</span><span class="tag">Pandas</span><span class="tag">Flask</span><span class="tag">JavaScript</span><span class="tag">MySQL</span><span class="tag">Postman</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>SilkCart</h3>
+        <p>A dynamic e-commerce platform for a silk and textile business, spanning men's fashion, women's fashion, cotton, linen, and fabric categories, with cart, checkout, and discount features.</p>
+        <div class="stack-row">
+          <span class="tag">Python</span><span class="tag">Django</span><span class="tag">JavaScript</span><span class="tag">MySQL</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="practice" data-sec="practice">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Freelance &amp; content practice</h2>
+      <span class="section-num mono">05</span>
+    </div>
+    <div class="practice-grid">
+      <div class="practice-card">
+        <div class="mark">01 — design</div>
+        <h4>UI/UX freelancing</h4>
+        <p>Independent interface and product design work for clients, applying the same user-centered process from wireframe to prototype.</p>
+      </div>
+      <div class="practice-card">
+        <div class="mark">02 — visual</div>
+        <h4>Photography &amp; editing</h4>
+        <p>Photography, photo retouching, and video editing — shooting and post-production for personal and client work.</p>
+      </div>
+      <div class="practice-card">
+        <div class="mark">03 — content</div>
+        <h4>Content development</h4>
+        <p>Ongoing content across Instagram and two YouTube channels — planning, shooting, editing, and publishing on a regular cadence.</p>
+        <a href="https://instagram.com/vishnu.on.a.vibe" target="_blank" rel="noopener">@vishnu.on.a.vibe →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="credentials" data-sec="credentials">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Certifications &amp; education</h2>
+      <span class="section-num mono">06</span>
+    </div>
+    <div class="split-row">
+      <div>
+        <h4 class="mono" style="font-size:12px;color:var(--accent-2);margin-bottom:10px;">certifications</h4>
+        <div class="list-item"><span class="name">Certified Ethical Hacker (CEH) — EC-Council</span><span class="meta">in progress</span></div>
+        <div class="list-item"><span class="name">Python Programming — Udemy</span><span class="meta">completed</span></div>
+      </div>
+      <div>
+        <h4 class="mono" style="font-size:12px;color:var(--accent-2);margin-bottom:10px;">education &amp; leadership</h4>
+        <div class="list-item"><span class="name">B.E. Information Science Engineering, CMRIT</span><span class="meta">2021 – 2025</span></div>
+        <div class="list-item"><span class="name">Promotion Lead, Startup Club, CMRIT</span><span class="meta">2021 – 2025</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="contact" data-sec="contact">
+  <div class="wrap">
+    <h2>Let's work together.</h2>
+    <p class="about-text">Open to software engineering roles, iOS and frontend work, and freelance UI/UX or content projects.</p>
+    <div class="contact-links">
+      <a class="btn primary" href="mailto:s.srikanthsurender@gmail.com">s.srikanthsurender@gmail.com</a>
+      <a class="btn ghost" href="tel:+918867779823">+91 88677 79823</a>
+      <a class="btn ghost" href="https://www.linkedin.com/in/srikanth-s-661029260/" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn ghost" href="https://github.com/SrikanthSadagopan" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <span>Srikanth S — Bengaluru, India</span>
+  <span>Built with intent, not a template.</span>
+</footer>
+
+<script>
+(function () {
+  // ---- Section registry for scrub bar ----
+  var sections = Array.from(document.querySelectorAll('[data-sec]'));
+  var track = document.getElementById('scrub-track');
+  var fill = document.getElementById('scrub-fill');
+  var label = document.getElementById('scrub-label');
+
+  sections.forEach(function (sec, i) {
+    if (i === 0) return; // skip hero dot on track itself
+    var dot = document.createElement('div');
+    dot.className = 'scrub-dot';
+    dot.style.left = (i / (sections.length - 1) * 100) + '%';
+    dot.title = sec.dataset.sec;
+    dot.addEventListener('click', function () {
+      sec.scrollIntoView({ behavior: 'smooth' });
+    });
+    track.appendChild(dot);
+  });
+  var dots = track.querySelectorAll('.scrub-dot');
+
+  function onScroll() {
+    var doc = document.documentElement;
+    var scrollTop = doc.scrollTop || document.body.scrollTop;
+    var height = doc.scrollHeight - doc.clientHeight;
+    var pct = height > 0 ? (scrollTop / height) * 100 : 0;
+    fill.style.width = pct + '%';
+
+    var current = sections[0];
+    for (var i = 0; i < sections.length; i++) {
+      var rect = sections[i].getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.5) current = sections[i];
+    }
+    label.textContent = current.dataset.sec;
+    dots.forEach(function (d) { d.classList.remove('active'); });
+    var idx = sections.indexOf(current);
+    if (idx > 0 && dots[idx - 1]) dots[idx - 1].classList.add('active');
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ---- Scroll reveal ----
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  // ---- Particle / network background (hero only) ----
+  var canvas = document.getElementById('particles');
+  var ctx = canvas.getContext('2d');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var w, h, nodes = [];
+
+  function resize() {
+    w = canvas.width = canvas.offsetWidth * devicePixelRatio;
+    h = canvas.height = canvas.offsetHeight * devicePixelRatio;
+  }
+  function isDark() {
+    return getComputedStyle(document.documentElement).getPropertyValue('color-scheme').indexOf('dark') > -1;
+  }
+  function initNodes() {
+    var count = Math.min(60, Math.floor((canvas.offsetWidth * canvas.offsetHeight) / 22000));
+    nodes = [];
+    for (var i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.25 * devicePixelRatio,
+        vy: (Math.random() - 0.5) * 0.25 * devicePixelRatio
+      });
+    }
+  }
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    var dark = isDark();
+    var lineColor = dark ? '69,224,206' : '14,128,116';
+    var dotColor = dark ? '232,237,243' : '14,20,32';
+
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      if (!reduceMotion) {
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > w) n.vx *= -1;
+        if (n.y < 0 || n.y > h) n.vy *= -1;
+      }
+      for (var j = i + 1; j < nodes.length; j++) {
+        var m = nodes[j];
+        var dx = n.x - m.x, dy = n.y - m.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        var maxDist = 160 * devicePixelRatio;
+        if (dist < maxDist) {
+          ctx.strokeStyle = 'rgba(' + lineColor + ',' + (0.16 * (1 - dist / maxDist)) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(n.x, n.y);
+          ctx.lineTo(m.x, m.y);
+          ctx.stroke();
+        }
+      }
+    }
+    for (var k = 0; k < nodes.length; k++) {
+      ctx.fillStyle = 'rgba(' + dotColor + ',0.5)';
+      ctx.beginPath();
+      ctx.arc(nodes[k].x, nodes[k].y, 1.6 * devicePixelRatio, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    if (!reduceMotion) requestAnimationFrame(draw);
+  }
+
+  resize();
+  initNodes();
+  draw();
+  window.addEventListener('resize', function () { resize(); initNodes(); });
+
+  // ---- Hero name decrypt-in effect ----
+  var nameEl = document.getElementById('decrypt-name');
+  var termCursor = document.getElementById('decrypt-cursor');
+  if (nameEl) {
+    var finalText = nameEl.textContent;
+    var chars = finalText.split('').map(function (c) {
+      var span = document.createElement('span');
+      span.className = 'ch';
+      span.textContent = c === ' ' ? '\u00A0' : c;
+      return span;
+    });
+    nameEl.textContent = '';
+    chars.forEach(function (s) { nameEl.appendChild(s); });
+
+    if (reduceMotion) {
+      chars.forEach(function (s) { s.classList.add('locked'); });
+      if (termCursor) termCursor.classList.add('done');
+    } else {
+      var glyphs = '01!<>-_\\/[]{}=+*^?#$%&';
+      var revealed = 0;
+      var frame = 0;
+      var stepsPerChar = 3;
+      setTimeout(function () {
+        var timer = setInterval(function () {
+          for (var i = revealed; i < chars.length; i++) {
+            if (finalText[i] === ' ') continue;
+            chars[i].textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+          }
+          frame++;
+          if (frame % stepsPerChar === 0 && revealed < chars.length) {
+            chars[revealed].textContent = finalText[revealed] === ' ' ? '\u00A0' : finalText[revealed];
+            chars[revealed].classList.add('locked');
+            revealed++;
+          }
+          if (revealed >= chars.length) {
+            clearInterval(timer);
+            if (termCursor) termCursor.classList.add('done');
+          }
+        }, 42);
+      }, 150);
+    }
+  }
+
+  // ---- Smooth cursor-following glow in hero ----
+  var hero = document.getElementById('hero');
+  var glow = document.getElementById('glow');
+  if (hero && glow && !reduceMotion && window.matchMedia('(hover: hover)').matches) {
+    var gx = 50, gy = 30, tx = 50, ty = 30;
+    hero.addEventListener('mousemove', function (e) {
+      var rect = hero.getBoundingClientRect();
+      tx = ((e.clientX - rect.left) / rect.width) * 100;
+      ty = ((e.clientY - rect.top) / rect.height) * 100;
+    });
+    (function loop() {
+      gx += (tx - gx) * 0.06;
+      gy += (ty - gy) * 0.06;
+      glow.style.setProperty('--gx', gx + '%');
+      glow.style.setProperty('--gy', gy + '%');
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  // ---- Custom reticle cursor ----
+  var supportsFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (supportsFinePointer && !reduceMotion) {
+    var html = document.documentElement;
+    var ring = document.getElementById('cursor-ring');
+    var dot = document.getElementById('cursor-dot');
+    html.classList.add('custom-cursor');
+    var rx = window.innerWidth / 2, ry = window.innerHeight / 2, mx = rx, my = ry;
+    var seen = false;
+    window.addEventListener('mousemove', function (e) {
+      mx = e.clientX; my = e.clientY;
+      dot.style.left = mx + 'px';
+      dot.style.top = my + 'px';
+      if (!seen) { rx = mx; ry = my; seen = true; }
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
+    });
+    (function loop() {
+      rx += (mx - rx) * 0.18;
+      ry += (my - ry) * 0.18;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(loop);
+    })();
+    var targets = 'a, button, .btn, .card, .chip, .practice-card, .job, .scrub-dot, .list-item';
+    document.addEventListener('mouseover', function (e) {
+      if (e.target.closest && e.target.closest(targets)) html.classList.add('cursor-active');
+    });
+    document.addEventListener('mouseout', function (e) {
+      if (e.target.closest && e.target.closest(targets)) html.classList.remove('cursor-active');
+    });
+    document.addEventListener('mouseleave', function () {
+      dot.style.opacity = '0'; ring.style.opacity = '0';
+    });
+  }
+})();
+</script>
+</body>
+</html>
